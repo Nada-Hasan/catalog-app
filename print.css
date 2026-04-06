@@ -72,7 +72,7 @@
     /* الجريد */
     .catalog-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(270px, 1fr));
+        grid-template-columns: repeat(2, minmax(240px, 1fr));
         gap: 14px;
         justify-items: center;
         width: 100%;
@@ -85,8 +85,8 @@
     /* الكارد */
     .card {
         width: 100%;
-        max-width: 310px;
-        min-height: 300px;
+        max-width: 100%;
+        min-height: auto;
         padding: 14px;
         box-sizing: border-box;
         page-break-inside: avoid;
