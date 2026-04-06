@@ -1,0 +1,412 @@
+body {
+    font-family: Arial;
+    background: #ffffff;
+    margin: 0;
+}
+
+.form-container {
+    max-width: 420px;
+    margin: 40px auto;
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-sizing: border-box;
+
+}
+
+.form-container input,
+.form-container select,
+.form-container button,
+.form-container label {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-container input,
+.form-container select {
+    text-align: right;
+    /* للغة العربية */
+    direction: rtl;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.form-container h2,
+.form-container h3 {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.form-container input,
+.form-container select {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.form-container input:focus,
+.form-container select:focus {
+    outline: none;
+    border-color: #2ecc71;
+    /* لون الثيم */
+}
+
+input,
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+}
+
+button {
+    cursor: pointer;
+}
+
+.primary {
+    background: #2ecc71;
+    color: white;
+    border: none;
+}
+
+.danger {
+    background: #e74c3c;
+    color: white;
+    border: none;
+}
+
+.badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    padding: 3px 6px;
+}
+
+
+.actions {
+    text-align: center;
+    margin: 20px;
+}
+
+
+.row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.products-list .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.products-list button {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 2px 6px;
+    cursor: pointer;
+}
+
+
+/* اسم المنتج */
+.card h4 {
+    font-size: 1.3rem;
+    margin: 10px 0 6px 0;
+}
+
+/* الأسعار */
+.card p {
+    font-size: 1rem;
+    margin: 4px 0;
+}
+
+/* الصفحة */
+.catalog-page {
+    width: 100%;
+    max-width: 1040px;
+    padding: 28px 24px;
+    box-sizing: border-box;
+    margin: 0 auto 40px;
+    page-break-after: always;
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+.catalog-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.catalog-header img {
+    max-width: 120px;
+    margin-bottom: 12px;
+}
+
+#previewContent {
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+#catalog {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 28px;
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto;
+    justify-items: center;
+}
+
+/* الكارد */
+.card {
+    width: 100%;
+    max-width: 360px;
+    min-height: 360px;
+    border: 2px solid;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* صورة المنتج */
+.product-image {
+    width: 100%;
+    height: 240px;
+    object-fit: contain;
+    margin-bottom: 16px;
+}
+
+/* الخصم */
+.discount-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #e53935;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+.catalog-logo {
+    width: 160px !important;
+    height: auto !important;
+    max-width: none !important;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+#catalog {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.catalog-page {
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto 40px;
+}
+
+.page-container {
+    width: 100%;
+    max-width: 1080px;
+    margin: 30px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+/* الـ Responsive للشاشات الذكية */
+@media screen and (max-width: 768px) {
+    .page-container {
+        margin: 15px auto;
+        padding: 10px;
+    }
+
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+    }
+
+    .catalog-page {
+        padding: 15px 20px !important;
+    }
+
+    .card {
+        width: 100% !important;
+        padding: 10px !important;
+    }
+
+    .product-image {
+        height: 140px;
+    }
+
+    .card h4 {
+        font-size: 14px;
+    }
+
+    .card p {
+        font-size: 12px;
+    }
+
+    .discount-badge {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    .catalog-header img {
+        max-width: 80px;
+    }
+}
+
+/* الـ Responsive للموبايل الصغير */
+@media screen and (max-width: 480px) {
+    .page-container {
+        margin: 10px auto;
+        padding: 8px;
+    }
+
+    .catalog-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .card {
+        max-width: 100%;
+    }
+
+    .product-image {
+        height: 120px;
+    }
+
+    .card h4 {
+        font-size: 13px;
+        margin: 4px 0 2px 0;
+    }
+
+    .card p {
+        font-size: 11px;
+        margin: 2px 0;
+    }
+
+    button {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .actions {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .actions button {
+        margin: 4px;
+    }
+}
+
+.catalogs-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.catalogs-table th,
+.catalogs-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: right;
+}
+
+.catalogs-table th {
+    background: #f5f5f5;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.icon-button {
+    background: #2ecc71;
+    color: #fff;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.icon-button.danger {
+    background: #e74c3c;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #555;
+}
+
+.product-row {
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-info {
+    display: grid;
+    gap: 4px;
+}
+
+.product-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.product-actions button {
+    width: auto;
+    padding: 8px 12px;
+}
+
+.form-actions {
+    display: grid;
+    gap: 10px;
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معاينة الكاتلوج</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/print.css" media="print">
+</head>
+
+<body onload="loadPreview()">
+
+    <div class="page-container">
+        <div class="page-actions">
+            <button class="primary" type="button" onclick="window.location.href='/'">قائمة الكاتلوجات</button>
+        </div>
+        <div id="previewContent">
+            <div class="catalog-header">
+                <img id="logoPreview" class="catalog-logo">
+                <h2 id="companyPreview"></h2>
+                <p id="companynotesPreview"></p>
+                <p id="phonePreview"></p>
+            </div>
+
+            <div id="catalog" class="catalog-grid"></div>
+        </div>
+
+        <div class="actions no-print">
+            <button onclick="savePNG()">تحميل PNG</button>
+            <button onclick="window.history.back()">رجوع</button>
+            <button onclick="window.print()">حفظ PDF</button>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+</body>
+
+</html>
