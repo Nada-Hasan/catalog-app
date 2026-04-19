@@ -82,7 +82,7 @@ button {
     left: 5px;
     background: red;
     color: white;
-    font-size: 12px;
+    font-size: 27px;
     padding: 3px 6px;
 }
 
@@ -209,7 +209,7 @@ button {
     color: #fff;
     padding: 8px 14px;
     border-radius: 16px;
-    font-size: 14px;
+    font-size: 27px;
     font-weight: bold;
 }
 
@@ -242,6 +242,10 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* خلفية اختيارية للكاتلوج - يمكن إزالتها إذا لم ترغب */
+    background: #ffffff !important;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .page-actions {
@@ -284,7 +288,7 @@ button {
     }
 
     .discount-badge {
-        font-size: 12px;
+        font-size: 25px;
         padding: 6px 10px;
     }
 
