@@ -1,11 +1,34 @@
 const catalogsKey = "catalogs";
 const previewDraftKey = "previewDraft";
+const themeLayoutKey = "catalogThemeLayout";
 let products = [];
 let editingProductIndex = null;
 let currentCatalogId = null;
 let currentLogoData = "";
+let isProcessing = false;
+let isPreviewProcessing = false;
+let isSavingCatalog = false;
+
+// تنظيف cache القديم عند تحميل الصفحة
+function clearStaleCache() {
+    try {
+        // تنظيف sessionStorage القديم إذا لم يتم استخدامه
+        const draftData = sessionStorage.getItem(previewDraftKey);
+        if (draftData) {
+            try {
+                JSON.parse(draftData);
+            } catch {
+                sessionStorage.removeItem(previewDraftKey);
+            }
+        }
+    } catch (err) {
+        console.error("خطأ في تنظيف الذاكرة المؤقتة:", err);
+    }
+}
 
 window.addEventListener("DOMContentLoaded", () => {
+    clearStaleCache();
+
     if (document.getElementById("catalogsTable")) {
         renderCatalogsList();
         return;
@@ -137,6 +160,7 @@ function attachStyleListeners() {
         "fontWeight",
         "direction",
         "themeColor",
+        "themeLayout",
         "companyName",
         "companyNotes",
         "companyPhone"
@@ -165,7 +189,7 @@ function updateCatalogStyle() {
 
     // تحديث نص الشركة والملاحظات والهاتف
     document.body.dir = direction;
-    
+
     const companyPreview = document.getElementById("companyPreview");
     const companynotesPreview = document.getElementById("companynotesPreview");
     const phonePreview = document.getElementById("phonePreview");
@@ -200,14 +224,14 @@ function updateCatalogStyle() {
         card.style.borderColor = theme;
         const h4 = card.querySelector("h4");
         const ps = card.querySelectorAll("p");
-        
+
         if (h4) {
             h4.style.fontFamily = font;
             h4.style.fontSize = fontSize + "px";
             h4.style.color = fontColor;
             h4.style.fontWeight = fontWeight;
         }
-        
+
         ps.forEach(p => {
             p.style.fontFamily = font;
             p.style.color = fontColor;
@@ -226,6 +250,7 @@ function loadCatalogToForm(catalog) {
     document.getElementById("companyNotes").value = catalog.notes || "";
     document.getElementById("companyPhone").value = catalog.phone || "";
     document.getElementById("themeColor").value = catalog.theme || "#2ecc71";
+    document.getElementById("themeLayout").value = catalog.themeLayout || localStorage.getItem(themeLayoutKey) || "theme1";
     document.getElementById("fontFamily").value = catalog.fontFamily || "Arial";
     document.getElementById("fontSize").value = catalog.fontSize || "20";
     document.getElementById("fontColor").value = catalog.fontColor || "#000000";
@@ -240,39 +265,96 @@ function loadCatalogToForm(catalog) {
 async function saveCatalog(event) {
     event.preventDefault();
 
-    const catalog = await collectFormData();
-
-    if (!catalog.company) {
-        alert("من فضلك اكتب اسم الشركة.");
+    if (isSavingCatalog) {
+        alert("جاري حفظ الكاتلوج... يرجى الانتظار");
         return;
     }
 
-    if (!catalog.products.length) {
-        alert("من فضلك أضف منتجًا واحدًا على الأقل.");
-        return;
+    const button = event?.target;
+    if (button) {
+        button.disabled = true;
+        button.textContent = "جاري الحفظ...";
     }
 
-    const catalogs = getCatalogs();
-    const existingIndex = catalogs.findIndex(item => String(item.id) === String(catalog.id));
+    isSavingCatalog = true;
 
-    catalog.updatedAt = Date.now();
-    if (existingIndex >= 0) {
-        catalogs[existingIndex] = catalog;
-    } else {
-        catalog.createdAt = Date.now();
-        catalogs.push(catalog);
+    try {
+        const catalog = await collectFormData();
+
+        if (!catalog.company) {
+            alert("من فضلك اكتب اسم الشركة.");
+            if (button) {
+                button.disabled = false;
+                button.textContent = "حفظ التعديلات";
+            }
+            isSavingCatalog = false;
+            return;
+        }
+
+        if (!catalog.products.length) {
+            alert("من فضلك أضف منتجًا واحدًا على الأقل.");
+            if (button) {
+                button.disabled = false;
+                button.textContent = "حفظ التعديلات";
+            }
+            isSavingCatalog = false;
+            return;
+        }
+
+        const catalogs = getCatalogs();
+        const existingIndex = catalogs.findIndex(item => String(item.id) === String(catalog.id));
+
+        catalog.updatedAt = Date.now();
+        if (existingIndex >= 0) {
+            catalogs[existingIndex] = catalog;
+        } else {
+            catalog.createdAt = Date.now();
+            catalogs.push(catalog);
+        }
+
+        setCatalogs(catalogs);
+        sessionStorage.removeItem(previewDraftKey);
+        window.location.href = "/";
+    } catch (err) {
+        console.error("خطأ في حفظ الكاتلوج:", err);
+        alert("خطأ في حفظ الكاتلوج. الرجاء المحاولة مرة أخرى");
+        isSavingCatalog = false;
+        if (button) {
+            button.disabled = false;
+            button.textContent = "حفظ التعديلات";
+        }
     }
-
-    setCatalogs(catalogs);
-    sessionStorage.removeItem(previewDraftKey);
-    window.location.href = "/";
 }
 
 async function goPreview(event) {
     if (event) event.preventDefault();
-    const catalog = await collectFormData();
-    sessionStorage.setItem(previewDraftKey, JSON.stringify(catalog));
-    window.location.href = "/preview";
+
+    if (isPreviewProcessing) {
+        alert("جاري تحضير المعاينة... يرجى الانتظار");
+        return;
+    }
+
+    isPreviewProcessing = true;
+    const button = event?.target;
+    if (button) {
+        button.disabled = true;
+        const originalText = button.textContent;
+        button.textContent = "جاري التحضير...";
+    }
+
+    try {
+        const catalog = await collectFormData();
+        sessionStorage.setItem(previewDraftKey, JSON.stringify(catalog));
+        window.location.href = "/preview";
+    } catch (err) {
+        console.error("خطأ في تحضير المعاينة:", err);
+        alert("خطأ في تحضير المعاينة. الرجاء المحاولة مرة أخرى");
+        isPreviewProcessing = false;
+        if (button) {
+            button.disabled = false;
+            button.textContent = "معاينة الكاتلوج";
+        }
+    }
 }
 
 async function collectFormData() {
@@ -282,11 +364,15 @@ async function collectFormData() {
     const companyLogoInput = document.getElementById("companyLogo");
 
     const themeColorInput = document.getElementById("themeColor");
+    const themeLayoutInput = document.getElementById("themeLayout");
     const fontFamilyInput = document.getElementById("fontFamily");
     const fontSizeInput = document.getElementById("fontSize");
     const fontColorInput = document.getElementById("fontColor");
     const fontWeightInput = document.getElementById("fontWeight");
     const directionInput = document.getElementById("direction");
+
+    const themeLayoutValue = themeLayoutInput?.value || localStorage.getItem(themeLayoutKey) || "theme1";
+    localStorage.setItem(themeLayoutKey, themeLayoutValue);
 
     let logoData = currentLogoData || "";
     if (companyLogoInput.files && companyLogoInput.files[0]) {
@@ -301,6 +387,7 @@ async function collectFormData() {
         phone: companyPhoneInput.value.trim(),
         logo: logoData,
         theme: themeColorInput.value,
+        themeLayout: themeLayoutValue,
         fontFamily: fontFamilyInput.value,
         fontSize: fontSizeInput.value,
         fontColor: fontColorInput.value,
@@ -455,6 +542,7 @@ function clearFormFields() {
     document.getElementById("companyPhone").value = "";
     document.getElementById("companyLogo").value = "";
     document.getElementById("themeColor").value = "#2ecc71";
+    document.getElementById("themeLayout").value = localStorage.getItem(themeLayoutKey) || "theme1";
     document.getElementById("fontFamily").value = "Arial";
     document.getElementById("fontSize").value = "20";
     document.getElementById("fontColor").value = "#000000";
@@ -486,6 +574,7 @@ function loadPreview() {
     }
 
     const theme = catalog.theme || "#2ecc71";
+    const themeLayout = catalog.themeLayout || localStorage.getItem(themeLayoutKey) || "theme1";
     const font = catalog.fontFamily || "Arial";
     let fontSize = Number(catalog.fontSize) || 20;
     fontSize = Math.max(fontSize, 20);
@@ -509,6 +598,7 @@ function loadPreview() {
     const catalogContainer = document.getElementById("catalog");
     catalogContainer.innerHTML = "";
 
+    const themeClass = themeLayout || "theme1";
     const PRODUCTS_PER_PAGE = 6;
     const productItems = Array.isArray(catalog.products) ? catalog.products : [];
 
@@ -516,7 +606,7 @@ function loadPreview() {
         const pageProducts = productItems.slice(i, i + PRODUCTS_PER_PAGE);
         let pageHTML = `
             <div class="catalog-page" style="font-family:${font}; font-size:${fontSize}px; color:${fontColor}; font-weight:${fontWeight};">
-                <div class="catalog-grid">
+                <div class="catalog-grid ${themeClass}">
         `;
 
         pageProducts.forEach(p => {
@@ -549,8 +639,28 @@ function loadPreview() {
 }
 
 function savePNG() {
+    if (isProcessing) {
+        alert("جاري حفظ الملف... يرجى الانتظار");
+        return;
+    }
+
+    isProcessing = true;
+    const button = event?.target;
+    if (button) {
+        button.disabled = true;
+        button.textContent = "جاري الحفظ...";
+    }
+
     const target = document.getElementById("previewContent") || document.getElementById("catalog");
-    if (!target) return;
+    if (!target) {
+        isProcessing = false;
+        if (button) {
+            button.disabled = false;
+            button.textContent = "تحميل PNG";
+        }
+        alert("خطأ: لا توجد بيانات للحفظ");
+        return;
+    }
 
     const oldStyles = {
         margin: target.style.margin,
@@ -584,9 +694,33 @@ function savePNG() {
         target.style.display = oldStyles.display;
         target.style.position = oldStyles.position;
 
-        const link = document.createElement("a");
-        link.download = "catalog.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
+        try {
+            const link = document.createElement("a");
+            link.download = "catalog.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        } catch (err) {
+            console.error("خطأ في تنزيل الملف:", err);
+            alert("خطأ في تحميل الملف. الرجاء المحاولة مرة أخرى");
+        } finally {
+            isProcessing = false;
+            if (button) {
+                button.disabled = false;
+                button.textContent = "تحميل PNG";
+            }
+        }
+    }).catch(err => {
+        console.error("خطأ في حفظ الصورة:", err);
+        alert("خطأ في حفظ الصورة. الرجاء المحاولة مرة أخرى");
+        target.style.margin = oldStyles.margin;
+        target.style.width = oldStyles.width;
+        target.style.padding = oldStyles.padding;
+        target.style.display = oldStyles.display;
+        target.style.position = oldStyles.position;
+        isProcessing = false;
+        if (button) {
+            button.disabled = false;
+            button.textContent = "تحميل PNG";
+        }
     });
 }
